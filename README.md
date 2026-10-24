@@ -1,4 +1,4 @@
-#Project: ShopFlow DevOps Capstone - containerized e-commerce platform.
+#Project: ShopFlow DevOps Capstone - a containerized, cloud-native e-commerce platform deployed with Docker, Kubernetes and ArgoCD
 
 This package contains **application source code only** for the ShopFlow DevOps mini-project.
 

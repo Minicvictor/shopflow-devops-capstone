@@ -1,0 +1,61 @@
+services:
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    networks:
+    - mynetwork
+    ports:
+    - 6378:6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    restart: always
+    networks:
+      - mynetwork
+    environment:
+      - POSTGRES_USER=shopflow
+      - POSTGRES_PASSWORD=shopflow
+      - POSTGRES_DB=shopflow
+    ports:
+      - 5433:5432
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  backend: 
+    image: shopflow-backend:latest
+    container_name: backend
+    restart: always
+    networks:
+      - mynetwork
+    ports:
+      - 5000:5000
+    env_file:
+      - ./backend/config.env
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+  
+  frontend:
+    image: shopflow-frontend:latest
+    container_name: frontend
+    restart: always
+    networks:
+      - mynetwork
+    ports:
+      - 8080:80
+
+networks:
+  mynetwork:

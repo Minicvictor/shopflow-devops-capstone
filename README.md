@@ -1,4 +1,4 @@
-# ShopFlow Application Source
+#Project: ShopFlow DevOps Capstone - containerized e-commerce platform.
 
 This package contains **application source code only** for the ShopFlow DevOps mini-project.
 

@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 env:
-  APP_DIR: shopflow-application
+  APP_DIR: .
 
 jobs:
   lint-test:
@@ -90,7 +90,7 @@ jobs:
           pip-audit -r ${{ env.APP_DIR }}/backend/requirements.txt
 
       - name: Source scan (Trivy filesystem)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.28.0
         with:
           scan-type: fs
           scan-ref: ${{ env.APP_DIR }}
@@ -113,7 +113,7 @@ jobs:
         run: docker build -t shopflow-frontend:ci ${{ env.APP_DIR }}/frontend
 
       - name: Scan backend image (Trivy)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.28.0
         with:
           image-ref: shopflow-backend:ci
           severity: HIGH,CRITICAL
@@ -121,7 +121,7 @@ jobs:
           exit-code: "1"
 
       - name: Scan frontend image (Trivy)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.28.0
         with:
           image-ref: shopflow-frontend:ci
           severity: HIGH,CRITICAL

@@ -1,4 +1,7 @@
-FROM python:3.11-slim 
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
@@ -17,5 +20,8 @@ RUN addgroup --system appgroup && \
 USER 10001
 
 EXPOSE 5000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:5000/health', timeout=3).status==200 else 1)"
 
 CMD ["python", "app.py"]

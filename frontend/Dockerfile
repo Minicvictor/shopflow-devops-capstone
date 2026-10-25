@@ -1,5 +1,9 @@
-FROM nginx:alpine
+FROM nginxinc/nginx-unprivileged:1.27-alpine
 
-COPY index.html /usr/share/nginx/html
+COPY index.html /usr/share/nginx/html/index.html
 
-EXPOSE 80
+EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+  CMD wget -qO- http://localhost:8080/ >/dev/null || exit 1
+

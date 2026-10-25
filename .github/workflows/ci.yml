@@ -90,13 +90,10 @@ jobs:
           pip-audit -r ${{ env.APP_DIR }}/backend/requirements.txt
 
       - name: Source scan (Trivy filesystem)
-        uses: aquasecurity/trivy-action@v0.28.0
-        with:
-          scan-type: fs
-          scan-ref: ${{ env.APP_DIR }}
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true
-          exit-code: "1"
+        run: |
+          docker run --rm -v "$PWD:/src" aquasec/trivy:latest fs \
+            --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 \
+            --skip-dirs .git /src/${{ env.APP_DIR }}
 
   build-scan:
     name: Build and scan images
@@ -113,17 +110,15 @@ jobs:
         run: docker build -t shopflow-frontend:ci ${{ env.APP_DIR }}/frontend
 
       - name: Scan backend image (Trivy)
-        uses: aquasecurity/trivy-action@v0.28.0
-        with:
-          image-ref: shopflow-backend:ci
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true
-          exit-code: "1"
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:latest image \
+            --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 \
+            shopflow-backend:ci
 
       - name: Scan frontend image (Trivy)
-        uses: aquasecurity/trivy-action@v0.28.0
-        with:
-          image-ref: shopflow-frontend:ci
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true
-          exit-code: "1"
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:latest image \
+            --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 \
+            shopflow-frontend:ci

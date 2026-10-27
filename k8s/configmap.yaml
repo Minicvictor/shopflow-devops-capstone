@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shopflow-config
+  namespace: shopflow
+  labels:
+    app.kubernetes.io/part-of: shopflow
+data:
+  REDIS_URL: "redis://redis:6379/0"
+  PORT: "5000"
+  POSTGRES_DB: "shopflow"

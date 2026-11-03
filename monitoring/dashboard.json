@@ -1,0 +1,46 @@
+import json
+
+DS = {"type": "prometheus", "uid": "prometheus"}
+pod = 'namespace="shopflow",container!="",container!="POD"'
+
+panels_def = [
+    ("Request rate (req/s)",
+     'sum(rate(flask_http_request_total[1m]))', "reqps", "requests/s"),
+    ("HTTP errors (4xx/5xx per second)",
+     'sum(rate(flask_http_request_total{status=~"[45].."}[1m])) by (status)', "reqps", "{{status}}"),
+    ("Request latency p95 (seconds)",
+     'histogram_quantile(0.95, sum(rate(flask_http_request_duration_seconds_bucket[5m])) by (le))', "s", "p95"),
+    ("Pod restarts",
+     'sum(kube_pod_container_status_restarts_total{namespace="shopflow"}) by (pod)', "short", "{{pod}}"),
+    ("CPU usage (cores)",
+     f'sum(rate(container_cpu_usage_seconds_total{{{pod}}}[2m])) by (pod)', "short", "{{pod}}"),
+    ("Memory usage",
+     f'sum(container_memory_working_set_bytes{{{pod}}}) by (pod)', "bytes", "{{pod}}"),
+    ("Workload health (available replicas)",
+     'kube_deployment_status_replicas_available{namespace="shopflow"}', "short", "{{deployment}}"),
+]
+
+panels = []
+for i, (title, expr, unit, legend) in enumerate(panels_def):
+    panels.append({
+        "id": i + 1,
+        "type": "timeseries",
+        "title": title,
+        "datasource": DS,
+        "gridPos": {"x": (i % 2) * 12, "y": (i // 2) * 8, "w": 12, "h": 8},
+        "fieldConfig": {"defaults": {"unit": unit}, "overrides": []},
+        "targets": [{"refId": "A", "datasource": DS, "expr": expr, "legendFormat": legend}],
+    })
+
+dash = {
+    "uid": "shopflow-overview",
+    "title": "ShopFlow Overview",
+    "schemaVersion": 39,
+    "version": 1,
+    "refresh": "10s",
+    "time": {"from": "now-30m", "to": "now"},
+    "panels": panels,
+}
+json.dump(dash, open("monitoring/dashboard.json", "w"), indent=2)
+print("wrote monitoring/dashboard.json")
+

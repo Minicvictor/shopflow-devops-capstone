@@ -13,6 +13,11 @@ data:
         access: proxy
         url: http://prometheus.monitoring.svc:9090
         isDefault: true
+      - name: Loki
+        type: loki
+        uid: loki
+        access: proxy
+        url: http://loki.monitoring.svc:3100
   dashboards.yaml: |
     apiVersion: 1
     providers:

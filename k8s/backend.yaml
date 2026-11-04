@@ -5,7 +5,6 @@ metadata:
   namespace: shopflow
   labels:
     app: backend
-    app.kubernetes.io/part-of: shopflow
 spec:
   replicas: 2
   selector:
@@ -15,12 +14,20 @@ spec:
     metadata:
       labels:
         app: backend
-        app.kubernetes.io/part-of: shopflow
     spec:
+      serviceAccountName: backend
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: backend
           image: shopflow-backend:1.0.0
           imagePullPolicy: Never
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
           ports:
             - containerPort: 5000
           envFrom:
@@ -37,14 +44,11 @@ spec:
               path: /ready
               port: 5000
             initialDelaySeconds: 10
-            periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /health
               port: 5000
             initialDelaySeconds: 20
-            periodSeconds: 20
-            failureThreshold: 3
           resources:
             requests:
               cpu: 100m
@@ -58,9 +62,6 @@ kind: Service
 metadata:
   name: backend
   namespace: shopflow
-  labels:
-    app: backend
-    app.kubernetes.io/part-of: shopflow
 spec:
   selector:
     app: backend
@@ -98,3 +99,4 @@ spec:
   selector:
     matchLabels:
       app: backend
+

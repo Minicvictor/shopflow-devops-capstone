@@ -5,7 +5,6 @@ metadata:
   namespace: shopflow
   labels:
     app: frontend
-    app.kubernetes.io/part-of: shopflow
 spec:
   replicas: 1
   selector:
@@ -15,26 +14,31 @@ spec:
     metadata:
       labels:
         app: frontend
-        app.kubernetes.io/part-of: shopflow
     spec:
+      serviceAccountName: frontend
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: frontend
           image: shopflow-frontend:1.0.0
           imagePullPolicy: Never
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
           ports:
             - containerPort: 8080
           readinessProbe:
             httpGet:
               path: /
               port: 8080
-            initialDelaySeconds: 5
-            periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /
               port: 8080
             initialDelaySeconds: 15
-            periodSeconds: 20
           resources:
             requests:
               cpu: 50m
@@ -48,9 +52,6 @@ kind: Service
 metadata:
   name: frontend
   namespace: shopflow
-  labels:
-    app: frontend
-    app.kubernetes.io/part-of: shopflow
 spec:
   type: NodePort
   selector:
@@ -58,3 +59,4 @@ spec:
   ports:
     - port: 80
       targetPort: 8080
+

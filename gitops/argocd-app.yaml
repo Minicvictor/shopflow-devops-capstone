@@ -21,6 +21,11 @@ spec:
   ignoreDifferences:
     - group: apps
       kind: Deployment
-      name: backend
+      name: backend-blue
+      jsonPointers:
+        - /spec/replicas
+    - group: apps
+      kind: Deployment
+      name: backend-green
       jsonPointers:
         - /spec/replicas

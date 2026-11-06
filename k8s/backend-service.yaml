@@ -6,7 +6,7 @@ metadata:
 spec:
   selector:
     app: backend
-    version: green # LIVE
+    version: blue # LIVE
   ports:
     - port: 5000
       targetPort: 5000
@@ -19,7 +19,7 @@ metadata:
 spec:
   selector:
     app: backend
-    version: blue # PREVIEW
+    version: green # PREVIEW
   ports:
     - port: 5000
       targetPort: 5000

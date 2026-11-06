@@ -27,7 +27,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: backend
-          image: shopflow-backend:1.0.0
+          image: shopflow-backend:1.2.0-broken
           imagePullPolicy: Never
           securityContext:
             allowPrivilegeEscalation: false

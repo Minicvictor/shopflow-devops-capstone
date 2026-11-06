@@ -37,3 +37,17 @@ data:
             labels: {severity: warning}
             annotations:
               summary: "{{ $labels.pod }} has not been ready for 2 minutes"
+      - name: shopflow-slo
+        rules:
+          - record: sli:availability:ratio_rate5m
+            expr: sum(rate(flask_http_request_total{status!~"5.."}[5m])) / sum(rate(flask_http_request_total[5m]))
+          - record: sli:availability:ratio_rate1h
+            expr: sum(rate(flask_http_request_total{status!~"5.."}[1h])) / sum(rate(flask_http_request_total[1h]))
+          - record: sli:latency_under_500ms:ratio_rate5m
+            expr: sum(rate(flask_http_request_duration_seconds_bucket{le="0.5"}[5m])) / sum(rate(flask_http_request_duration_seconds_count[5m]))
+          - alert: ErrorBudgetFastBurn
+            expr: (1 - sli:availability:ratio_rate1h) / 0.005 > 6
+            for: 5m
+            labels: {severity: critical}
+            annotations:
+              summary: "Availability error budget is burning more than 6x faster than allowed"
